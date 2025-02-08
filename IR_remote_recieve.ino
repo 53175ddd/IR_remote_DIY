@@ -8,6 +8,10 @@
 #define AEHA_FORMAT_LEADER_LENGTH  8
 #define SONY_FORMAT_LEADER_LENGTH  4
 
+#define NEC  0
+#define AEHA 1
+#define SONY 2
+
 typedef struct {
   int16_t on;
   int16_t off;
@@ -25,6 +29,7 @@ void setup() {
 
 void loop() {
   /* 変数の宣言 */
+  int8_t type;
   float T_width = 0.0f;
   int16_t step = 0;
   uint32_t leader_low = 0, leader_high = 0, hex_code = 0;
@@ -71,6 +76,8 @@ void loop() {
   raw_data[step - 1].on  = 0;
 
   step -= 2;  // 余分に足した分を差っ引く
+
+  /* 1T の長さを計算 */
   for(int16_t i = 0; i < step; i++) {
     T_width += (float)raw_data[i].on / (float)step;
   }
@@ -86,32 +93,34 @@ void loop() {
   }
 
   /* 信号種別をレポート */
-  if(((NEC_FORMAT_LEADER_LENGTH  / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (NEC_FORMAT_LEADER_LENGTH  * 1.25))) Serial.print("NEC format signal detected\n");
-  if(((AEHA_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (AEHA_FORMAT_LEADER_LENGTH * 1.25))) Serial.print("AEHA format signal detected\n");
-  if(((SONY_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (SONY_FORMAT_LEADER_LENGTH * 1.25))) Serial.print("SONY format signal detected\n");
+  if(((NEC_FORMAT_LEADER_LENGTH  / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (NEC_FORMAT_LEADER_LENGTH  * 1.25))) Serial.print("NEC format signal detected\n");  type = NEC;
+  if(((AEHA_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (AEHA_FORMAT_LEADER_LENGTH * 1.25))) Serial.print("AEHA format signal detected\n"); type = AEHA;
+  if(((SONY_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (SONY_FORMAT_LEADER_LENGTH * 1.25))) Serial.print("SONY format signal detected\n"); type = SONY;
 
-  if(DEBUG) {
-    for(int16_t i = 0; i < step; i++) {
-      Serial.print(raw_data[i].on);
-      Serial.print(' ');
-      Serial.print(raw_data[i].off);
-      Serial.print('\n');
+  if(type == NEC) {
+    if(DEBUG) {
+      for(int16_t i = 0; i < 32; i++) {
+        Serial.print(raw_data[i].on);
+        Serial.print(' ');
+        Serial.print(raw_data[i].off);
+        Serial.print('\n');
+      }
     }
-  }
 
-  Serial.print("code (BIN) : ");
-  for(int16_t i = 0; i < step; i++) {
-    if(((i % 8) == 0) && (i != 0)) Serial.print('-');
-    Serial.print(((raw_data[i].off / raw_data[i].on) > 1.5) ? 1 : 0);
-  }
-  Serial.print('\n');
+    Serial.print("code (BIN) : ");
+    for(int16_t i = 0; i < step; i++) {
+      if(((i % 8) == 0) && (i != 0)) Serial.print('-');
+      Serial.print(((raw_data[i].off / raw_data[i].on) > 1.5) ? 1 : 0);
+    }
+    Serial.print('\n');
 
-  Serial.print("code (HEX) : 0x");
-  for(int16_t i = 0; i < step; i++) {
-    hex_code = (hex_code << 1) + (((raw_data[i].off / raw_data[i].on) > 1.5) ? 1 : 0);
+    Serial.print("code (HEX) : 0x");
+    for(int16_t i = 0; i < step; i++) {
+      hex_code = (hex_code << 1) + (((raw_data[i].off / raw_data[i].on) > 1.5) ? 1 : 0);
+    }
+    print_uint32(hex_code);
+    Serial.print('\n');  
   }
-  print_uint32(hex_code);
-  Serial.print('\n');  
 
   Serial.print('\n');
   delay(100);
