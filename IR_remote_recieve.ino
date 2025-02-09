@@ -44,20 +44,6 @@ void loop() {
   while(digitalRead(SENSOR_INPUT_PIN) == HIGH);  // LOW の信号が来るまで待つ
   get_elapsed_time();
 
-  /* リーダ信号を取得 */
-  while(digitalRead(SENSOR_INPUT_PIN) ==  LOW);  // HIGH の信号が来るまで待つ
-  leader_low = get_elapsed_time();
-
-  while(digitalRead(SENSOR_INPUT_PIN) == HIGH);  // LOW の信号が来るまで待つ
-  leader_high = get_elapsed_time();
-
-  if(DEBUG) sprintf(buffer, "Leader Low width : %d / High width : %d\n", leader_low, leader_high);
-
-  if(DEBUG) {
-    char debug[64];
-    sprintf(debug, "leader_low : %d / leader_high %d\n", leader_low, leader_high);
-  }
-
   while(in_loop) {
     while(digitalRead(SENSOR_INPUT_PIN) ==  LOW);  // HIGH の信号が来るまで待つ
     leader_low = get_elapsed_time();
@@ -74,7 +60,10 @@ void loop() {
     step++;
   }
 
-  if(DEBUG) Serial.print(buffer);
+  if(DEBUG) {
+    sprintf(buffer, "Leader Low width : %d / High width : %d\n", raw_data[0].on, raw_data[0].off);
+    Serial.print(buffer);
+  }
 
   /* 変なデータを受信しているっぽいので削除 */
   raw_data[step - 2].off = 0;
@@ -83,7 +72,7 @@ void loop() {
   step -= 2;  // 余分に足した分を差っ引く
 
   /* 1T の長さを計算 */
-  for(int16_t i = 0; i < step; i++) {
+  for(int16_t i = 1; i < step; i++) {
     T_width += (float)raw_data[i].on / (float)step;
   }
 
@@ -126,15 +115,15 @@ void loop() {
     }
 
     Serial.print("code (BIN) : ");
-    for(int16_t i = 0; i < step; i++) {
+    for(int16_t i = 0; i < 32; i++) {
       if(((i % 8) == 0) && (i != 0)) Serial.print('-');
-      Serial.print(((raw_data[i].off / raw_data[i].on) > 1.5) ? 1 : 0);
+      Serial.print(((raw_data[i + 1].off / raw_data[i + 1].on) > 1.5) ? 1 : 0);
     }
     Serial.print('\n');
 
     Serial.print("code (HEX) : 0x");
-    for(int16_t i = 0; i < step; i++) {
-      hex_code = (hex_code << 1) + (((raw_data[i].off / raw_data[i].on) > 1.5) ? 1 : 0);
+    for(int16_t i = 0; i < 32; i++) {
+      hex_code = (hex_code << 1) + (((raw_data[i + 1].off / raw_data[i + 1].on) > 1.5) ? 1 : 0);
     }
     print_uint32(hex_code);
     Serial.print('\n');  
