@@ -26,6 +26,10 @@ void setup() {
 
   /* シリアル通信の初期設定 */
   Serial.begin(115200);
+
+  /* デバッグモードの状態を表示 */
+  Serial.print("Debug Mode Status : ");
+  Serial.print(DEBUG ? "true\n\n" : "false\n\n");
 }
 
 void loop() {
@@ -36,10 +40,6 @@ void loop() {
   uint32_t leader_low = 0, leader_high = 0, hex_code = 0;
   bool in_loop = true;
   char buffer[64];
-
-  /* デバッグモードの状態を表示 */
-  Serial.print("Debug Mode Status : ");
-  Serial.print(DEBUG ? "true\n\n" : "false\n\n");
 
   /* 待機メッセージ表示 */
   Serial.print("Waiting data...\n\n");
