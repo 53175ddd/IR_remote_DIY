@@ -110,13 +110,20 @@ void loop() {
 
   if(type == NEC) {
     if(DEBUG) {
+      Serial.print("signal_t signal[] = {\n");
       for(int16_t i = 0; i < 32; i++) {
+        Serial.print("  {");
         Serial.print(raw_data[i].on);
-        Serial.print(' ');
+        Serial.print(", ");
         Serial.print(raw_data[i].off);
-        Serial.print('\n');
+        Serial.print("},\n");
       }
-      Serial.print('\n');
+      Serial.print("  {");
+      Serial.print(raw_data[32].on);
+      Serial.print(", ");
+      Serial.print(raw_data[32].off);
+      Serial.print("}\n");
+      Serial.print("};\n\n");
     }
 
     Serial.print("code (BIN) : ");
