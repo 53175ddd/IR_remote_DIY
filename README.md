@@ -17,6 +17,8 @@
 ### デバッグモード無効
 
 ```
+Debug Mode Status : false
+
 Waiting data...
 
 NEC format signal detected
@@ -35,6 +37,8 @@ code (HEX) : 0x01A359A6
 ### デバッグモード有効
 
 ```
+Debug Mode Status : true
+
 Waiting data...
 
 Leader Low width : 8988 / High width : 4464
