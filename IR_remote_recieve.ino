@@ -12,7 +12,7 @@
 #define NEC   0
 #define AEHA  1
 #define SONY  2
-  
+
 typedef struct {
   int16_t on;
   int16_t off;
@@ -36,6 +36,10 @@ void loop() {
   uint32_t leader_low = 0, leader_high = 0, hex_code = 0;
   bool in_loop = true;
   char buffer[64];
+
+  /* デバッグモードの状態を表示 */
+  Serial.print("Debug Mode Status : ");
+  Serial.print(DEBUG ? "true\n\n" : "false\n\n");
 
   /* 待機メッセージ表示 */
   Serial.print("Waiting data...\n\n");
@@ -128,6 +132,12 @@ void loop() {
     }
     print_uint32(hex_code);
     Serial.print('\n');  
+  }
+
+  if(type == AEHA) {
+  }
+
+  if(type == SONY) {
   }
 
   Serial.print('\n');
