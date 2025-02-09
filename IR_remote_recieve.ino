@@ -13,6 +13,8 @@
 #define AEHA 1
 #define SONY 2
 
+#define SONY  2
+  
 typedef struct {
   int16_t on;
   int16_t off;
@@ -83,25 +85,25 @@ void loop() {
     Serial.print(T_width);
     Serial.print("\nLeader pulse rate : ");
     Serial.print(leader_pulse_rate);
-    Serial.print('\n');
+    Serial.print("\n\n");
   }
 
   /* 信号種別をレポート */
   if(((NEC_FORMAT_LEADER_LENGTH  / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (NEC_FORMAT_LEADER_LENGTH  * 1.25))) {
-    Serial.print("NEC format signal detected\n");
+    Serial.print("NEC format signal detected\n\n");
     type = NEC;
   }
   if(((AEHA_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (AEHA_FORMAT_LEADER_LENGTH * 1.25))) {
-    Serial.print("AEHA format signal detected\n");
+    Serial.print("AEHA format signal detected\n\n");
     type = AEHA;
   }
   if(((SONY_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (SONY_FORMAT_LEADER_LENGTH * 1.25))) {
-    Serial.print("SONY format signal detected\n");
+    Serial.print("SONY format signal detected\n\n");
     type = SONY;
   }
 
   if(type == NONE) {
-    Serial.print("Unknown signal received\n");
+    Serial.print("Unknown signal received\n\n");
   }
 
   if(type == NEC) {
@@ -112,6 +114,7 @@ void loop() {
         Serial.print(raw_data[i].off);
         Serial.print('\n');
       }
+      Serial.print('\n');
     }
 
     Serial.print("code (BIN) : ");
