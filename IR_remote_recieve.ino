@@ -9,10 +9,8 @@
 #define SONY_FORMAT_LEADER_LENGTH  4
 
 #define NONE -1
-#define NEC  0
-#define AEHA 1
-#define SONY 2
-
+#define NEC   0
+#define AEHA  1
 #define SONY  2
   
 typedef struct {
