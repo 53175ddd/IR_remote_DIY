@@ -1,4 +1,4 @@
-#define DEBUG false
+#define DEBUG true
 
 #define SENSOR_INPUT_PIN     5
 #define MAX_DATA_LENGTH    128
@@ -8,6 +8,7 @@
 #define AEHA_FORMAT_LEADER_LENGTH  8
 #define SONY_FORMAT_LEADER_LENGTH  4
 
+#define NONE -1
 #define NEC  0
 #define AEHA 1
 #define SONY 2
@@ -29,7 +30,7 @@ void setup() {
 
 void loop() {
   /* 変数の宣言 */
-  int8_t type;
+  int8_t type = -1;
   float T_width = 0.0f;
   int16_t step = 0;
   uint32_t leader_low = 0, leader_high = 0, hex_code = 0;
@@ -49,6 +50,8 @@ void loop() {
 
   while(digitalRead(SENSOR_INPUT_PIN) == HIGH);  // LOW の信号が来るまで待つ
   leader_high = get_elapsed_time();
+
+  if(DEBUG) sprintf(buffer, "Leader Low width : %d / High width : %d\n", leader_low, leader_high);
 
   if(DEBUG) {
     char debug[64];
@@ -71,6 +74,8 @@ void loop() {
     step++;
   }
 
+  if(DEBUG) Serial.print(buffer);
+
   /* 変なデータを受信しているっぽいので削除 */
   raw_data[step - 2].off = 0;
   raw_data[step - 1].on  = 0;
@@ -87,15 +92,28 @@ void loop() {
   if(DEBUG) {
     Serial.print("1T width : ");
     Serial.print(T_width);
-    Serial.print("Leader pulse rate : ");
+    Serial.print("\nLeader pulse rate : ");
     Serial.print(leader_pulse_rate);
     Serial.print('\n');
   }
 
   /* 信号種別をレポート */
-  if(((NEC_FORMAT_LEADER_LENGTH  / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (NEC_FORMAT_LEADER_LENGTH  * 1.25))) Serial.print("NEC format signal detected\n");  type = NEC;
-  if(((AEHA_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (AEHA_FORMAT_LEADER_LENGTH * 1.25))) Serial.print("AEHA format signal detected\n"); type = AEHA;
-  if(((SONY_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (SONY_FORMAT_LEADER_LENGTH * 1.25))) Serial.print("SONY format signal detected\n"); type = SONY;
+  if(((NEC_FORMAT_LEADER_LENGTH  / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (NEC_FORMAT_LEADER_LENGTH  * 1.25))) {
+    Serial.print("NEC format signal detected\n");
+    type = NEC;
+  }
+  if(((AEHA_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (AEHA_FORMAT_LEADER_LENGTH * 1.25))) {
+    Serial.print("AEHA format signal detected\n");
+    type = AEHA;
+  }
+  if(((SONY_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (SONY_FORMAT_LEADER_LENGTH * 1.25))) {
+    Serial.print("SONY format signal detected\n");
+    type = SONY;
+  }
+
+  if(type == NONE) {
+    Serial.print("Unknown signal received\n");
+  }
 
   if(type == NEC) {
     if(DEBUG) {
