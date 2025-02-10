@@ -90,17 +90,14 @@ void loop() {
     Serial.print("\n\n");
   }
 
-  /* 信号種別をレポート */
+  /* フォーマットを判別 */
   if(((NEC_FORMAT_LEADER_LENGTH  / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (NEC_FORMAT_LEADER_LENGTH  * 1.25))) {
-    Serial.print("NEC format signal detected\n\n");
     type = NEC;
   }
   if(((AEHA_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (AEHA_FORMAT_LEADER_LENGTH * 1.25))) {
-    Serial.print("AEHA format signal detected\n\n");
     type = AEHA;
   }
   if(((SONY_FORMAT_LEADER_LENGTH / 1.25) < leader_pulse_rate) && (leader_pulse_rate < (SONY_FORMAT_LEADER_LENGTH * 1.25))) {
-    Serial.print("SONY format signal detected\n\n");
     type = SONY;
   }
 
@@ -109,13 +106,15 @@ void loop() {
   }
 
   if(type == NEC) {
+    Serial.print("NEC format signal detected\n\n");
+
     if(DEBUG) {
       for(int16_t i = 0; i < 33; i++) {
         Serial.print(raw_data[i].on);
         Serial.print(' ');
         Serial.print(raw_data[i].off);
         Serial.print('\n');
-      };
+      }
       Serial.print(raw_data[33].on);
       Serial.print(' ');
       Serial.print(raw_data[33].off);
@@ -134,16 +133,17 @@ void loop() {
       hex_code = (hex_code << 1) + (((raw_data[i + 1].off / raw_data[i + 1].on) > 1.5) ? 1 : 0);
     }
     print_uint32(hex_code);
-    Serial.print('\n');  
+    Serial.print("\n\n");  
   }
 
   if(type == AEHA) {
+    Serial.print("AEHA format signal detected\n\n");
   }
 
   if(type == SONY) {
+    Serial.print("SONY format signal detected\n\n"); 
   }
 
-  Serial.print('\n');
   delay(100);
 }
 
