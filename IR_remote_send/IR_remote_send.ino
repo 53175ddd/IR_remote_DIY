@@ -37,32 +37,30 @@ void loop() {
   if((sw_on_status & 0b11) == 0b01) {
     Serial.print("sending Light ON signal\n");
 
-    send_leader(NEC);
-    for(int8_t i = 31; i >= 0; i--) {
-      uint16_t wait = (on_signal & (1 << i)) == 0 ? NEC_DATA_0_OFF_LENGTH : NEC_DATA_1_OFF_LENGTH;
-      tone(IR_OUT_PIN, CARRIER_FREQ);
-      delayMicroseconds(NEC_DATA_ON_LENGTH);
-      noTone(IR_OUT_PIN);
-      delayMicroseconds(wait);
-    }
-    send_trailer(NEC);
+    send_signal(on_signal);
   }
 
   if((sw_off_status & 0b11) == 0b01) {
     Serial.print("sending Light OFF signal\n");
 
-    send_leader(NEC);
-    for(int8_t i = 31; i >= 0; i--) {
-      uint16_t wait = (off_signal & (1 << i)) == 0 ? NEC_DATA_0_OFF_LENGTH : NEC_DATA_1_OFF_LENGTH;
-      tone(IR_OUT_PIN, CARRIER_FREQ);
-      delayMicroseconds(NEC_DATA_ON_LENGTH);
-      noTone(IR_OUT_PIN);
-      delayMicroseconds(wait);
-    }
-    send_trailer(NEC);
+    send_signal(off_signal);
   }
 
   delay(10);
+}
+
+void send_signal(uint32_t signal) {
+    send_leader(NEC);
+    for(int8_t i = 31; i >= 0; i--) {
+      uint16_t wait1 = NEC_DATA_ON_LENGTH;
+      uint16_t wait2 = (signal & (1 << i)) == 0 ? NEC_DATA_0_OFF_LENGTH : NEC_DATA_1_OFF_LENGTH;
+
+      tone(IR_OUT_PIN, CARRIER_FREQ);
+      delayMicroseconds(wait1);
+      noTone(IR_OUT_PIN);
+      delayMicroseconds(wait2);
+    }
+    send_trailer(NEC);
 }
 
 void send_leader(int8_t type) {
