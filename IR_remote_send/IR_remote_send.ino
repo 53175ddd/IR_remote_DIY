@@ -4,13 +4,13 @@
 
 #define CARRIER_FREQ 38000
 
-#define NEC_T_LENGTH 580
+#define NEC_T_LENGTH 560
 
-#define NEC_LEADER_ON_LENGTH  (NEC_T_LENGTH * 16)
-#define NEC_LEADER_OFF_LENGTH (NEC_T_LENGTH *  8)
-#define NEC_DATA_ON_LENGTH    (NEC_T_LENGTH *  1)
-#define NEC_DATA_0_OFF_LENGTH (NEC_T_LENGTH *  1)
-#define NEC_DATA_1_OFF_LENGTH (NEC_T_LENGTH *  3)
+#define NEC_LEADER_ON_LENGTH  9000  // 16T 相当の時間
+#define NEC_LEADER_OFF_LENGTH 4500  //  8T 相当
+#define NEC_DATA_ON_LENGTH     560  //  1T 相当
+#define NEC_DATA_0_OFF_LENGTH  560  //  1T 相当
+#define NEC_DATA_1_OFF_LENGTH 1690  //  3T 相当
 
 #define NEC  0
 #define AEHA 1
